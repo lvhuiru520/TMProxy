@@ -1,0 +1,14 @@
+{
+    "proxyPort": 8080,
+    "localPort": null,
+    "localScript": "npm start",
+    "localPath": "[]",
+    "localEnable": false,
+    "localAutoEnable": false,
+    "openOrCloseWindow": "Alt+Q",
+    "switchTab": "Tab",
+    "openOrCloseConsole": "Alt+F12",
+    "startup": false,
+    "subdomainList": "master,master1,master2,master3,tenant,trialos",
+    "domainList": "dev,test"
+}

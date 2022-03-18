@@ -1,0 +1,39 @@
+{
+    "name": "ccp-proxy-program-electron",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "electron . mode=development",
+        "packager": "electron-packager ./ TMProxy --out=./../build/ --platform=win32 --arch=x64 --overwrite",
+        "app:dist": "electron-builder"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "http-proxy": "^1.18.1",
+        "kill-port": "^1.6.1",
+        "node-cli-params": "^1.0.0",
+        "tree-kill": "^1.2.2"
+    },
+    "devDependencies": {
+        "electron": "^17.1.2",
+        "electron-builder": "^22.14.13",
+        "electron-packager": "^15.4.0"
+    },
+    "build": {
+        "appId": "tm.proxy",
+        "productName": "TMProxy",
+        "directories": {
+            "output": "installDir"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowElevation": true,
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true
+        }
+    }
+}

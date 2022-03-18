@@ -1,0 +1,17 @@
+{
+    "name": "ccp-proxy-program",
+    "version": "1.0.0",
+    "description": "",
+    "main": "",
+    "scripts": {
+        "start": "concurrently \"cd front && npm start\"  \"cd electron && npm start\"",
+        "packager": "cd front && npm run build && cd .. && cd electron && npm run packager",
+        "install-packager": "cd front && npm run build && cd .. && cd electron && npm run app:dist"
+    },
+    "keywords": [],
+    "author": "lvhuiru",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^7.0.0"
+    }
+}
