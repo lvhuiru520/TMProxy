@@ -9,7 +9,16 @@ const {
 } = require("../tools");
 const { ccp_start } = require("../childProcess");
 const startCCPService = (event) => {
-    const ccp = ccp_start();
+    const ccp = ccp_start({
+        errorCallback: (err) => {
+            replyFn({
+                event,
+                message: "connect-close",
+                params: err,
+            });
+            console.log(err, "err");
+        },
+    });
     ccp.stdout.on("data", (data) => {
         replyFn({
             event,
@@ -25,20 +34,20 @@ const startCCPService = (event) => {
         });
     });
     ccp.stderr.on("close", (stream) => {
-        replyFn({
-            event,
-            message: "connect-close",
-            params: stream,
-        });
-        console.log(stream, "stream close");
+        // replyFn({
+        //     event,
+        //     message: "connect-close",
+        //     params: stream,
+        // });
+        console.log(stream, "close");
     });
     return ccp;
 };
 
 function showNotification() {
     new Notification({
-        title: "CCP",
-        body: "启动成功",
+        title: "TMProxy",
+        body: "本地项目启动成功",
     }).show();
 }
 
@@ -47,10 +56,7 @@ const start = (event) => {
         port: config.localPort,
         successFn: () => {
             app.ccp_process = startCCPService(event, (data) => {
-                if (
-                    !app.firstCompiled &&
-                    data.includes("Compiled successfully.")
-                ) {
+                if (!app.firstCompiled && data.includes("编译成功")) {
                     app.firstCompiled = true;
                     showNotification();
                 }

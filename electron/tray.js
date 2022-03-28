@@ -26,8 +26,8 @@ const createTray = () => {
         },
     ]);
     tray.setContextMenu(contextMenu);
-    tray.setToolTip("CCP");
-    tray.setTitle("CCP");
+    tray.setToolTip("TMProxy");
+    tray.setTitle("TMProxy");
     const win = BrowserWindow.getFocusedWindow();
     tray.on("double-click", function () {
         win.show();
