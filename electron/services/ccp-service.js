@@ -25,6 +25,11 @@ const startCCPService = (event) => {
         });
     });
     ccp.stderr.on("close", (stream) => {
+        replyFn({
+            event,
+            message: "connect-close",
+            params: stream,
+        });
         console.log(stream, "stream close");
     });
     return ccp;

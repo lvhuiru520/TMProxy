@@ -13,8 +13,11 @@ const replaceChildren = ({ parent, arg, color }) => {
     if (color) {
         divDom.style.color = color;
     }
-    parent.replaceChildren(divDom);
-    // parent.appendChild(divDom);
+    if (parent.lineNum % 100 === 0) {
+        parent.replaceChildren(divDom);
+    } else {
+        parent.appendChild(divDom);
+    }
     parent.scrollTo(0, parent.scrollHeight);
     parent.lineNum++;
 };
@@ -44,6 +47,14 @@ export default function Local(props) {
                             arg: arg.params,
                             color: "red",
                         });
+                        break;
+                    case "connect-close":
+                        replaceChildren({
+                            parent: contentRef.current,
+                            arg: arg.params,
+                            color: "red",
+                        });
+                        setStarted(false);
                         break;
                     case "start-successful":
                         contentRef.current.lineNum = 1;
