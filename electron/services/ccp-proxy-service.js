@@ -10,28 +10,34 @@ const proxyServer = require("../proxy");
 
 const ccp_proxy_connect = () => {
     const serverStart = (event, params) => {
-        const server = (app.ccp_proxy_server = proxyServer(params));
-        server.on("listening", () => {
-            replyFn({
-                event,
-                message: "start-successful",
-                params: {
-                    current: params,
-                    data: {
-                        proxyAddress: `http://${params.subdomain}.${params.domain}.com`,
-                        localAddress: `http://127.0.0.1:${config.proxyPort}`,
-                    },
-                },
-            });
-        });
-        server.on("error", (stream) => {
-            replyFn({
-                event,
-                message: "server-error",
-                params: { data: stream },
-            });
-        });
-        server.on("close", (stream) => {
+        const proxy = (app.ccp_proxy_server = proxyServer({
+            ...params,
+            logFn: (data) => {
+                console.log("connect", data);
+                replyFn({
+                    event,
+                    message: "server-connecting",
+                    params: data,
+                });
+            },
+            errorFn: (data) => {
+                console.log(data, "error");
+                replyFn({
+                    event,
+                    message: "server-error",
+                    params: data,
+                });
+            },
+            onListeningFn: () => {
+                console.log("start", params);
+                replyFn({
+                    event,
+                    params: params,
+                    message: "start-successful",
+                });
+            },
+        }));
+        proxy._server.on("close", (stream) => {
             replyFn({
                 event,
                 message: "ccp-proxy-closed",

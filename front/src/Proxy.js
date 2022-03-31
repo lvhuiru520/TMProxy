@@ -21,35 +21,22 @@ export default function Proxy(props) {
         if (contentRef) {
             contentRef.current.lineNum = 1;
             ipcRenderer.on("ccp-proxy-reply", (event, arg) => {
+                console.log(arg, "error");
                 switch (arg.message) {
                     case "start-successful":
                         console.log("start-successful");
-                        for (const key in arg.params.data) {
-                            if (
-                                Object.hasOwnProperty.call(arg.params.data, key)
-                            ) {
-                                const element = arg.params.data[key];
-                                switch (key) {
-                                    case "proxyAddress":
-                                        appendChild({
-                                            parent: contentRef.current,
-                                            arg: `代理地址：${element}`,
-                                        });
-                                        break;
-                                    case "localAddress":
-                                        appendChild({
-                                            parent: contentRef.current,
-                                            arg: `本机地址：${element}`,
-                                        });
-                                        break;
-                                }
-                            }
-                        }
                         setStarted(true);
-                        setCurrent(arg.params.current);
+                        setCurrent(arg.params);
                         setPortExist(false);
                         message.success("服务启动成功");
                         break;
+                    case "server-connecting": {
+                        appendChild({
+                            parent: contentRef.current,
+                            arg: arg.params,
+                        });
+                        break;
+                    }
                     case "server-error":
                         appendChild({
                             parent: contentRef.current,
