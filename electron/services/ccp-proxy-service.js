@@ -1,17 +1,14 @@
 const { app, ipcMain } = require("electron");
 const killPort = require("kill-port");
 
-const {
-    checkPortExist,
-    ccpProxyReplyFn: replyFn,
-    allConfig: config,
-} = require("../tools");
+const { ccpProxyReplyFn: replyFn, allConfig: config } = require("../tools");
 const proxyServer = require("../proxy");
 
 const ccp_proxy_connect = () => {
     const serverStart = (event, params) => {
-        const proxy = (app.ccp_proxy_server = proxyServer({
+        const proxy = proxyServer({
             ...params,
+            port: config.proxyPort,
             logFn: (data) => {
                 console.log("connect", data);
                 replyFn({
@@ -36,39 +33,37 @@ const ccp_proxy_connect = () => {
                     message: "start-successful",
                 });
             },
-        }));
-        proxy._server.on("close", (stream) => {
+            onPortInUseFn: () => {
+                // 端口号被占用
+                replyFn({
+                    event,
+                    message: "port-in-use",
+                });
+            },
+        });
+        proxy.on("close", (stream) => {
+            console.log("close", stream);
             replyFn({
                 event,
                 message: "ccp-proxy-closed",
                 params: stream,
             });
+            app.ccp_proxy_server = null;
         });
+        app.ccp_proxy_server = proxy;
     };
     ipcMain.on("ccp-proxy-listening", (event, arg) => {
         switch (arg.type) {
             case "start":
-                checkPortExist({
-                    port: config.proxyPort,
-                    successFn: () => {
-                        serverStart(event, arg.params);
-                    },
-                    errorFn: () => {
-                        replyFn({
-                            event,
-                            message: "port-in-use",
-                        });
-                    },
-                });
+                serverStart(event, arg.params);
                 break;
             case "pause":
-                app.ccp_proxy_server.close((err) => {
-                    if (!err) {
-                        replyFn({
-                            event,
-                            message: "pause-successful",
-                        });
-                    }
+                console.log("pause");
+                app.ccp_proxy_server.close(() => {
+                    replyFn({
+                        event,
+                        message: "pause-successful",
+                    });
                 });
                 break;
             case "switch":

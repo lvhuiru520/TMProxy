@@ -1,19 +1,23 @@
 const httpProxy = require("http-proxy");
-const { allConfig: config } = require("../tools");
-
+const { allConfig: config, commonErrorCode } = require("../tools");
+const events = require("events");
+events.EventEmitter.defaultMaxListeners = 0;
 const proxyServer = ({
     domain = "test",
     subdomain = "master",
     logFn = () => {},
     errorFn = () => {},
     onListeningFn = () => {},
+    onPortInUseFn = () => {},
+    port,
 }) => {
     const options = {
-        target: `http://${subdomain}.${domain}.com`,
+        // target: `http://${subdomain}.${domain}.com`,
+        target: "http://localhost:3005/",
         changeOrigin: true,
-        /* cookieDomainRewrite: {
+        cookieDomainRewrite: {
             "*": "",
-        }, */
+        },
     };
     const proxy = httpProxy
         .createProxyServer(options)
@@ -32,33 +36,38 @@ const proxyServer = ({
         }`; // target is undefined when websocket errors
         errorFn(
             `[HPM] Error occurred while proxying request ${requestHref} to ${targetHref} ${
-                err.code || err
+                (commonErrorCode[err.code]
+                    ? err.code + " " + commonErrorCode[err.code]
+                    : err.code) || err
             }`
         );
+        res.destroy();
     });
     function onError(error) {
         if (error.syscall !== "listen") {
-            errorFn(error);
+            proxy.close(() => {
+                errorFn(error);
+            });
         }
-
         var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
-
         // handle specific listen errors with friendly messages
         switch (error.code) {
             case "EACCES":
-                errorFn(bind + " requires elevated privileges");
-            /* process.exit(1); */
+                proxy.close(() => {
+                    errorFn(bind + " requires elevated privileges");
+                });
             case "EADDRINUSE":
-                errorFn(bind + " is already in use");
-            /* process.exit(1); */
+                proxy.close(() => {
+                    // errorFn(bind + " is already in use");
+                    onPortInUseFn();
+                    console.log(proxy.listenerCount(), "proxy");
+                });
             default:
-                errorFn(error);
+                proxy.close(() => {
+                    errorFn(error);
+                });
         }
     }
-
-    /**
-     * Event listener for HTTP server "listening" event.
-     */
 
     function onListening() {
         onListeningFn();

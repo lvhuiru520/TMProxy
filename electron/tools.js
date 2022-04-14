@@ -81,10 +81,27 @@ const allConfig = checkFileExist()
     ? Object.assign(defaultConfig, require(userProfileConfig))
     : defaultConfig;
 
+const commonErrorCode = {
+    EACCES: "权限被拒绝",
+    EADDRINUSE: "地址已被使用",
+    ECONNRESET: "对等方重置连接",
+    EEXIST: "文件存在",
+    EISDIR: "是目录",
+    EMFILE: "系统中打开的文件太多",
+    ENOENT: "无此文件或目录",
+    ENOTDIR: "不是目录",
+    ENOTEMPTY: "目录不为空",
+    ENOTFOUND: "域名系统查找失败",
+    EPERM: "不允许操作",
+    EPIPE: "断开的管道",
+    ETIMEDOUT: "操作超时",
+};
+
 module.exports = {
     checkPortExist,
     ccpProxyReplyFn,
     ccpReplyFn,
     allConfig,
     userProfileConfig,
+    commonErrorCode,
 };

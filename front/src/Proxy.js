@@ -70,7 +70,7 @@ export default function Proxy(props) {
                         break;
                     case "ccp-proxy-closed":
                         console.log("ccp-proxy-closed");
-                        started(false);
+                        setStarted(false);
                         setCurrent();
                         break;
                 }
@@ -128,8 +128,9 @@ export default function Proxy(props) {
                 style={{
                     display: "flex",
                     flexDirection: "column",
-                    height: "calc(100vh - 100px)",
+                    height: "calc(100vh - 106px)",
                     padding: 20,
+                    overflow: "auto",
                 }}
             >
                 <div
