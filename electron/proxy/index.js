@@ -12,8 +12,7 @@ const proxyServer = ({
     port,
 }) => {
     const options = {
-        // target: `http://${subdomain}.${domain}.com`,
-        target: "http://localhost:3005/",
+        target: `http://${subdomain}.${domain}.com`,
         changeOrigin: true,
         cookieDomainRewrite: {
             "*": "",
