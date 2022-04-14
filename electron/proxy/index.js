@@ -37,7 +37,7 @@ const proxyServer = ({
         errorFn(
             `[HPM] Error occurred while proxying request ${requestHref} to ${targetHref} ${
                 (commonErrorCode[err.code]
-                    ? err.code + " " + commonErrorCode[err.code]
+                    ? err.code + `(${commonErrorCode[err.code]})`
                     : err.code) || err
             }`
         );
